@@ -1,5 +1,7 @@
     package com.example.Store_Service.Api.model;
 
+    import java.time.LocalTime;
+    
     import com.fasterxml.jackson.annotation.JsonBackReference;
     
     import jakarta.persistence.*;
@@ -25,8 +27,12 @@
         @Column(name = "phone_number")
         private String phoneNumber;
 
-        @Column(name = "reservation_time")
-        private String reservationTime;
+        @Column(name = "start_time")
+        private LocalTime startTime;
+
+        @Column(name = "end_time")
+        private LocalTime endTime;
+
     
         // ✅ เพิ่ม index จาก TableModel ด้วย @Transient
     @Transient

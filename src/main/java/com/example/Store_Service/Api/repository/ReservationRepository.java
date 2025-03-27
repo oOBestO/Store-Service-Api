@@ -5,7 +5,8 @@
     import org.springframework.data.jpa.repository.Query;
     import org.springframework.stereotype.Repository;
 
-    import java.util.List;
+import java.time.LocalTime;
+import java.util.List;
 
     @Repository
     public interface ReservationRepository extends JpaRepository<ReservationModel, Long> {
@@ -14,5 +15,8 @@
         List<ReservationModel> findByTableId(Long tableId);
         @Query("SELECT r FROM ReservationModel r JOIN FETCH r.table t") // ✅ JOIN FETCH เพื่อดึงข้อมูลโต๊ะที่เชื่อมกัน
         List<ReservationModel> findAllWithTableIndex();
-
+        @Query("SELECT r.table.id FROM ReservationModel r " +
+        "WHERE (:start < r.endTime AND :end > r.startTime)")
+        List<Long> findReservedTableIdsByTimeOverlap(LocalTime start, LocalTime end);
+ 
     }

@@ -19,4 +19,5 @@ public interface TableRepository extends JpaRepository<TableModel, Long> {
     @Query("SELECT DISTINCT t FROM TableModel t LEFT JOIN t.reservations")
     List<TableModel> findAllWithReservations();
     
+    List<TableModel> findByIdNotIn(List<Long> ids);
 }

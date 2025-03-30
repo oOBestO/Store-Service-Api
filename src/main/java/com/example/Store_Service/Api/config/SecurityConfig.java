@@ -1,6 +1,10 @@
 package com.example.Store_Service.Api.config;
 
+import com.example.Store_Service.Api.config.JwtAuthenticationFilter;
 import com.example.Store_Service.Api.service.UserService;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,11 +15,19 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 
-@EnableWebSecurity
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
+
+    private final ApplicationContext context;
+
+    public SecurityConfig(ApplicationContext context) {
+        this.context = context;
+    }
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -23,32 +35,42 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService(UserService userService) {
-        return userService;
-    }
-
-    @Bean
-    public AuthenticationProvider authenticationProvider(UserService userService) {
+    public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService(userService));
+        authProvider.setUserDetailsService(context.getBean(UserService.class)); // Lazy resolve
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtFilter) throws Exception {
         return http
-            .csrf(csrf -> csrf.disable()) // ❗ ปิด CSRF สำหรับ API
-            .cors(cors -> cors.disable()) // ❗ ปิด CORS (หรือปรับแต่งใน CorsConfig)
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll() // ✅ อนุญาตให้ API `/api/auth/**` ใช้งานได้โดยไม่ต้องล็อกอิน
-                .anyRequest().authenticated()
-            )
-            .build();
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> {})
+                .authorizeHttpRequests(auth -> auth
+                    .requestMatchers("/login", "/api/auth/**").permitAll()
+                    .requestMatchers("/api/tables/**").authenticated() // ✅ ตรวจตรงนี้
+                    .requestMatchers("/api/images/**").permitAll() 
+                    .requestMatchers("/api/upload/**").permitAll()
+                    .requestMatchers("/api/orders/**").authenticated()
+                    .anyRequest().authenticated()
+                )
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/home", true)
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout")
+                        .permitAll()
+                )
+                .build();
     }
 }

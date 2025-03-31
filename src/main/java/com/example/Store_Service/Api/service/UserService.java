@@ -29,11 +29,11 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
-
+    
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getUsername())
                 .password(user.getPassword())
-                .roles("USER") // ✅ หรือกำหนด Role ตามจริง
+                .roles(user.getRole().name()) // ใช้ ENUM เป็น String เช่น "ADMIN"
                 .build();
     }
 }

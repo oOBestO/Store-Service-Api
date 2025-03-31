@@ -48,10 +48,15 @@ public class MenuController {
 
      // ✅ บันทึกหรืออัปเดตเมนูตาม ID
      @PostMapping("/save")
-     public ResponseEntity<Menu> saveOrUpdateMenu(@RequestBody Menu menu) {
-        Menu savedMenu = menuService.saveOrUpdate(menu);
-        return ResponseEntity.ok(savedMenu);
-     }
+    public ResponseEntity<Map<String, Object>> saveOrUpdateMenu(@RequestBody Menu menu) {
+    Menu savedMenu = menuService.saveOrUpdate(menu);
+    
+    Map<String, Object> response = new HashMap<>();
+    response.put("message", "เพิ่มเมนูสำเร็จ!");
+    response.put("menu", savedMenu); // ใส่เมนูที่บันทึกกลับไปด้วยถ้าต้องการ
+
+    return ResponseEntity.ok(response);
+}
 
      @PostMapping("/getMenusByIds")
      public List<Menu> getMenusByIds(@RequestBody Map<String, List<Long>> request) {

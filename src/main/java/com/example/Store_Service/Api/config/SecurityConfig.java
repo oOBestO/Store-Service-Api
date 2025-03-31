@@ -54,10 +54,11 @@ public class SecurityConfig {
                 .cors(cors -> {})
                 .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/login", "/api/auth/**").permitAll()
-                    .requestMatchers("/api/tables/**").authenticated() // ✅ ตรวจตรงนี้
+                    .requestMatchers("/api/tables/**").permitAll() // ✅ ตรวจตรงนี้
                     .requestMatchers("/api/images/**").permitAll() 
                     .requestMatchers("/api/upload/**").permitAll()
-                    .requestMatchers("/api/orders/**").authenticated()
+                    .requestMatchers("/api/menus/**").permitAll()
+                    .requestMatchers("/api/orders/**").permitAll()
                     .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)

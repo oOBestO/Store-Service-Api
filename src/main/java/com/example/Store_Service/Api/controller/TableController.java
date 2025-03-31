@@ -1,10 +1,13 @@
 package com.example.Store_Service.Api.controller;
 
 import com.example.Store_Service.Api.model.TableModel;
+import com.example.Store_Service.Api.repository.TableRepository;
 import com.example.Store_Service.Api.model.ReservationModel;
 import com.example.Store_Service.Api.service.TableService;
+
 import com.example.Store_Service.Api.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +18,9 @@ import java.util.Optional;
 @RequestMapping("/api/tables")
 @CrossOrigin(origins = "http://localhost:4200") // อนุญาตให้ Angular เชื่อมต่อ
 public class TableController {
+
+    @Autowired
+    private TableRepository tableRepository;
 
     @Autowired
     private TableService tableService;
@@ -28,6 +34,32 @@ public class TableController {
         return tableService.saveTable(table);
     }
 
+    @GetMapping("/exists/{index}")
+    public boolean checkIfTableExists(@PathVariable String index) {
+        return tableRepository.existsByIndex(index);
+    }
+ 
+
+    @PostMapping("/save")
+    public ResponseEntity<?> saveTable(@RequestBody TableModel table) {
+        if (tableRepository.existsByIndex(table.getIndex())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("มีข้อมูลโต๊ะนี้อยู่แล้ว");
+        }
+
+        try {
+            int seats = Integer.parseInt(table.getSeats());
+            if (seats <= 0) {
+                return ResponseEntity.badRequest().body("จำนวนที่นั่งต้องมากกว่า 0");
+            }
+        } catch (NumberFormatException e) {
+            return ResponseEntity.badRequest().body("จำนวนที่นั่งต้องเป็นตัวเลขเท่านั้น");
+        }
+        
+
+        TableModel saved = tableRepository.save(table);
+        return ResponseEntity.ok(saved);
+    }
+    
     // ✅ ดึงข้อมูลโต๊ะทั้งหมด
     @GetMapping
     public List<TableModel> getAllTables() {

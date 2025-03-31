@@ -14,6 +14,9 @@ public class OrderDTO {
     private boolean paid;
     private LocalDateTime createdAt;
     private List<OrderItemDTO> items;
+    private int tableIndex;
+    private boolean delivered;
+
   // ✅ Constructor ที่ต้องเพิ่ม
     public OrderDTO(Orders order) {
         this.id = order.getId();
@@ -22,6 +25,7 @@ public class OrderDTO {
         this.totalAmount = order.getTotalAmount();
         this.paid = order.isPaid(); // ✅ อย่าลืม!
         this.createdAt = order.getCreatedAt(); // ✅ ควรใส่เวลาด้วย
+        this.delivered = order.isDelivered(); // ✅ สำคัญ!
 
         this.items = order.getItems() // << ตรวจตรงนี้ให้ใช้ชื่อ field ที่ถูกต้อง
             .stream()
@@ -29,6 +33,12 @@ public class OrderDTO {
             .collect(Collectors.toList());
     }
     // ✅ Getter/Setter
+    public boolean isDelivered() {return delivered;}
+    public void setDelivered(boolean delivered) {this.delivered = delivered;}
+
+    public int getTableIndex() {return tableIndex;}
+    public void setTableIndex(int tableIndex) {this.tableIndex = tableIndex;}
+
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

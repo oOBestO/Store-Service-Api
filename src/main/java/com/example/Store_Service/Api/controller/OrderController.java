@@ -49,6 +49,23 @@ public class OrderController {
     response.put("message", "อัปเดตสถานะสำเร็จ");
     return ResponseEntity.ok(response);
 }
+    @PutMapping("/{orderId}/deliver")
+    public ResponseEntity<Map<String, String>> confirmDelivered(@PathVariable Long orderId) {
+    orderService.updateDeliveryStatus(orderId, true);
+    Map<String, String> response = new HashMap<>();
+    response.put("message", "Order marked as delivered");
+    return ResponseEntity.ok(response);
+}
+
+    @PutMapping("/{orderId}/cancel-deliver")
+    public ResponseEntity<Map<String, String>> cancelDelivered(@PathVariable Long orderId) {
+    orderService.updateDeliveryStatus(orderId, false);
+    Map<String, String> response = new HashMap<>();
+    response.put("message", "Delivery status canceled");
+    return ResponseEntity.ok(response);
+}
+
+
 
     @GetMapping("/all-unpaid")
     public ResponseEntity<List<OrderDTO>> getAllUnpaidOrders() {
@@ -73,9 +90,10 @@ public class OrderController {
 
     @GetMapping("/paid")
     public ResponseEntity<List<OrderDTO>> getPaidOrders() {
-        List<OrderDTO> orders = orderService.findAllPaidOrderDTOs();
-        return ResponseEntity.ok(orders);
+    List<OrderDTO> orders = orderService.findAllPaidOrderDTOs();
+    return ResponseEntity.ok(orders); // ✅ ต้องส่ง DTO ที่มี delivered
     }
+
 
     @GetMapping("/{orderId}")
     public ResponseEntity<Orders> getOrderById(@PathVariable Long orderId) {

@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 @RequestMapping("/api/images")
 @CrossOrigin(origins = "http://localhost:4200")
 public class ImageController {
-    private static final String UPLOAD_DIR = "C:\\Users\\ASUS\\Downloads\\imgStoreService\\";
+    private static final String UPLOAD_DIR = "C:\\Users\\natta\\Downloads\\imgStoreService\\";
 
     @GetMapping("/{fileName}")
     public ResponseEntity<Resource> getImage(@PathVariable String fileName) {

@@ -20,4 +20,5 @@ public interface TableRepository extends JpaRepository<TableModel, Long> {
     List<TableModel> findAllWithReservations();
     
     List<TableModel> findByIdNotIn(List<Long> ids);
+    boolean existsByIndex(String index);
 }

@@ -12,6 +12,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
@@ -30,6 +32,13 @@ public class Orders {
     private String customerName;
     private double totalAmount;
     private boolean paid = false;
+    @Column(nullable = false)
+    private boolean delivered = false;
+
+
+    @ManyToOne
+    @JoinColumn(name = "table_id") // เชื่อมกับตารางโต๊ะ
+    private TableModel table;
 
     @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL)
     @JsonManagedReference // ✅ ใส่ตรง parent
@@ -40,6 +49,10 @@ public class Orders {
     private LocalDateTime createdAt;
 
     // ✅ Getter & Setter
+    public TableModel getTable() {
+        return table;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -49,6 +62,14 @@ public class Orders {
     }
 
     // ✅ Getter & Setter
+    public boolean isDelivered() {
+        return delivered;
+    }
+    
+    public void setDelivered(boolean delivered) {
+        this.delivered = delivered;
+    }
+
     public int getTableNumber() {
         return tableNumber;
     }

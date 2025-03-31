@@ -5,6 +5,7 @@ import com.example.Store_Service.Api.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -26,11 +27,12 @@ public class AuthController {
     String password = request.get("password");
 
     if (userService.authenticate(username, password)) {
-        String token = jwtService.generateToken(username); // 🔐 สร้าง JWT
+    UserDetails userDetails = userService.loadUserByUsername(username);
+    String token = jwtService.generateToken(userDetails);
 
-        Map<String, String> response = new HashMap<>();
-        response.put("token", token);
-        return ResponseEntity.ok(response);
+    Map<String, String> response = new HashMap<>();
+    response.put("token", token);
+    return ResponseEntity.ok(response);
     } else {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
     }

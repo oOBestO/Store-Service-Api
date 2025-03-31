@@ -3,9 +3,11 @@ package com.example.Store_Service.Api.service;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,9 +18,17 @@ public class JwtService {
 
     private final String SECRET_KEY = "mySuperSecretJwtKey123456789"; // แนะนำให้เก็บใน environment variable
 
-    public String generateToken(String username) {
+    public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, username);
+
+        // ✅ ดึง role จาก authorities และเพิ่มเข้า claims
+        Collection<? extends GrantedAuthority> authorities = userDetails.getAuthorities();
+        if (!authorities.isEmpty()) {
+            String role = authorities.iterator().next().getAuthority();
+            claims.put("role", role);
+        }
+
+        return createToken(claims, userDetails.getUsername());
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
@@ -36,6 +46,12 @@ public class JwtService {
     // ✅ ดึง username จาก token
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    // ✅ ดึง role จาก token
+    public String extractRole(String token) {
+        Claims claims = extractAllClaims(token);
+        return claims.get("role", String.class);
     }
 
     // ✅ ตรวจสอบ token ว่าหมดอายุหรือไม่
@@ -65,6 +81,4 @@ public class JwtService {
                 .parseClaimsJws(token)
                 .getBody();
     }
-
-    // คุณสามารถมี method generateToken(), createToken(), ฯลฯ อยู่ในไฟล์นี้ได้เช่นกัน
-}
+} 

@@ -17,7 +17,7 @@ import java.util.UUID;
 @CrossOrigin(origins = "http://localhost:4200")
 public class FileUploadController {
 
-    private static final String UPLOAD_DIR = "C:\\Users\\ASUS\\Downloads\\imgStoreService\\"; // ✅ กำหนด Path ที่ถูกต้อง
+    private static final String UPLOAD_DIR = "C:\\Users\\natta\\Downloads\\imgStoreService\\"; // ✅ กำหนด Path ที่ถูกต้อง
 
     @PostMapping
     public ResponseEntity<Map<String, String>> uploadFile(@RequestParam("file") MultipartFile file) {

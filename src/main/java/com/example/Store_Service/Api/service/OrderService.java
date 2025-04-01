@@ -109,4 +109,11 @@ public class OrderService {
                 d -> LocalDate.parse(d.getDate())))
             .collect(Collectors.toList());
     }
+    public void updateDeliveryStatus(Long orderId, boolean delivered) {
+        Orders order = orderRepo.findById(orderId)
+            .orElseThrow(() -> new RuntimeException("ไม่พบคำสั่งซื้อ"));
+        order.setDelivered(delivered);
+        orderRepo.save(order);
+    }
+    
 }
